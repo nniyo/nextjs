@@ -29,6 +29,8 @@ jobs:
         uses: actions/checkout@v3
       - name: congigure a node js
         uses: actions/setup-node@v3
+      - name: installing new vesion of npm next-app ........
+        run: npm install npm@latest
       - name: installing next-app ........
         run: npm install
       - name: Run linting test
@@ -42,6 +44,10 @@ jobs:
     steps:
       - name: clone repository
         uses: actions/checkout@v3
+        - name: congigure a node js
+          uses: actions/setup-node@v3
+      - name: installing new vesion of npm next-app ........
+        run: npm install npm@latest
       - name: build and push docker image
         uses: mr-smithers-excellent/docker-build-push@v4
         with:
