@@ -1,0 +1,79 @@
+name: ci/cd project
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: clone repository
+        uses: actions/checkout@v3
+      - name: congigure a node js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14.x'
+      - name: installing dependecies
+        run: |
+          echo "running installing dependecies ......"
+          npm install
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: clone repository
+        uses: actions/checkout@v3
+      - name: congigure a node js
+        uses: actions/setup-node@v3
+      - name: installing next-app ........
+        run: npm install
+      - name: Run linting test
+        run: |
+          echo "running linting test ......"
+          npm run lint
+
+  dockerize:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: clone repository
+        uses: actions/checkout@v3
+      - name: build and push docker image
+        uses: mr-smithers-excellent/docker-build-push@v4
+        with:
+          image: shaloomniyibizi/node-app
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+  securityCheck:
+    needs: build
+    name: security checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: check for security
+        run: |
+          echo "running securuty check 1 ......"
+          sleep 5s
+          echo "running securuty check 2 ......"
+          sleep 5s
+          echo "running securuty check 3 ......"
+          sleep 5s
+          echo "running securuty check 4 ......"
+          sleep 5s
+
+  deploy:
+    name: deployment
+    runs-on: self-hosted
+    needs: securityCheck
+    steps:
+      - name: Pull image from docker hub
+        run: docker pull shaloomniyibizi/node-app
+      # - name: Delete old container
+      #   run: docker rm -f new-docker-frontend
+      - name: Run docher container
+        run: docker compose up
